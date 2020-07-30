@@ -1,0 +1,34 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "utcValue": {
+            "type": "string",
+            "defaultValue": "[utcNow()]"
+        }
+    },
+    "variables": { },
+    "resources": [
+        {
+            "type": "Microsoft.Resources/deploymentScripts",
+            "apiVersion": "2019-10-01-preview",
+            "name": "jc2020061001",
+            "location": "westus",
+            "kind": "AzurePowershell",
+            "identity": {
+			    "type": "UserAssigned",
+			    "userAssignedIdentities": {
+			        "subscriptions//resourceGroups/jcotillo-script-debug/providers/Microsoft.ManagedIdentity/userAssignedIdentities/jcotillo-script-msi": {}
+			    }
+			},
+            "properties": {
+                "forceUpdateTag": "[parameters('utcValue')]",
+                "AzCliVersion": "3.8",
+                "timeout": "PT30M",
+                "arguments": "-First \\\"foo: Script\\\" 'something'",
+                "scriptContent": "Write-Host $First",
+                "retentionInterval": "P1D"
+            }
+        }
+    ]
+}

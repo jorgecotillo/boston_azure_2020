@@ -1,0 +1,49 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "utcValue": {
+            "type": "string",
+            "defaultValue": "[utcNow()]"
+        }
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Resources/deploymentScripts",
+            "apiVersion": "2019-10-01-preview",
+            "name": "runPwshInlineWithOutputs",
+            "location": "[resourceGroup().location]",
+            "identity": {
+                "type": "UserAssigned",
+                "userAssignedIdentities": {
+                    "subscriptions//resourceGroups/jcotillo-script-debug/providers/Microsoft.ManagedIdentity/userAssignedIdentities/jcotillo-script-msi": {}
+                }
+            },
+            "kind": "AzurePowerShell",
+            "properties": {
+                "forceUpdateTag": "[parameters('utcValue')]",
+                "azPowerShellVersion": "3.0",
+                "timeout": "PT30M",
+                "arguments": "'foo' 'bar'",
+                "scriptContent": "
+                    param([string] $First, [string] $Second)
+                        Import-Module .\\my_module.psm1;
+                        $DeploymentScriptOutputs = @{};
+                        $myResult = Get-PathFromFileFunction -First $First -Second $Second;
+                        $DeploymentScriptOutputs['ScriptOutput'] = $myResult;
+                ",
+                "supportingScriptUris": [
+                    "https://"
+                ],
+                "cleanupPreference": "OnExpiration",
+                "retentionInterval": "P1D"
+            }
+        }
+    ],
+    "outputs": {
+        "myResult": {
+           "type": "object",
+           "value": "[reference('runPwshInlineWithOutputs').Outputs.ScriptOutput]"
+        }
+    }
+}

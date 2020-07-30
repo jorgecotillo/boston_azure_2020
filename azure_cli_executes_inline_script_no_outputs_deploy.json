@@ -1,0 +1,61 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "utcValue": {
+            "type": "string",
+            "defaultValue": "[utcNow()]"
+        }
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Resources/deploymentScripts",
+            "apiVersion": "2019-10-01-preview",
+            "name": "runBashInlineNoOutput",
+            "location": "[resourceGroup().location]",
+            "identity": {
+                "type": "UserAssigned",
+                "userAssignedIdentities": {
+                    "subscriptions/foo/resourceGroups/bar/Microsoft.ManagedIdentity/userAssignedIdentities/baz": {}
+                }
+            },
+            "kind": "AzureCLI",
+            "properties": {
+                "forceUpdateTag": "[parameters('utcValue')]",
+                "AzCliVersion": "3.0",
+                "timeout": "PT30M",
+                "arguments": "'foo' 'bar'",
+                "scriptContent": "
+                    echo \"argument1 is $1\"; echo \"argument2 is $2\"",
+                "cleanupPreference": "OnExpiration",
+                "retentionInterval": "P1D"
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deploymentScripts",
+            "apiVersion": "2019-10-01-preview",
+            "name": "runBashInlineNoOutput02",
+            "dependsOn":[
+                "runBashInlineNoOutput01"
+            ],
+            "location": "[resourceGroup().location]",
+            "identity": {
+                "type": "UserAssigned",
+                "userAssignedIdentities": {
+                    "subscriptions//resourceGroups/jcotillo-script-debug/providers/Microsoft.ManagedIdentity/userAssignedIdentities/jcotillo-script-msi": {}
+                }
+            },
+            "kind": "AzureCLI",
+            "properties": {
+                "forceUpdateTag": "[parameters('utcValue')]",
+                "AzCliVersion": "2.0.80",
+                "timeout": "PT30M",
+                "arguments": "'foo' 'bar'",
+                "scriptContent": "echo \"argument1 is $1\"; echo \"argument2 is $2\"",
+                "cleanupPreference": "OnExpiration",
+                "retentionInterval": "P1D"
+            }
+        }
+    ],
+    "outputs": {}
+}
