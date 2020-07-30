@@ -11,7 +11,7 @@
         {
             "type": "Microsoft.Resources/deploymentScripts",
             "apiVersion": "2019-10-01-preview",
-            "name": "runPwshInlineWithEscapedOutputs",
+            "name": "runBashWithFiles",
             "location": "[resourceGroup().location]",
             "identity": {
                 "type": "UserAssigned",
@@ -19,31 +19,33 @@
                     "subscriptions//resourceGroups/jcotillo-script-debug/providers/Microsoft.ManagedIdentity/userAssignedIdentities/jcotillo-script-msi": {}
                 }
             },
-            "kind": "AzurePowerShell",
+            "kind": "AzureCLI",
             "properties": {
                 "forceUpdateTag": "[parameters('utcValue')]",
-                "azPowerShellVersion": "3.0",
+                "AzCliVersion": "2.0.80",
                 "timeout": "PT30M",
-                "arguments": "-First \\\"foo\\\" -Second \\\"bar\\\"",
+                "arguments": "'foo' 'bar'",
                 "scriptContent": "
-                    param([string] $First, [string] $Second)
-                        Import-Module .\\my_module.psm1;
-                        $DeploymentScriptOutputs = @{};
-                        $myResult = Get-PathFromFileFunction -First $First -Second $Second;
-                        $DeploymentScriptOutputs['ScriptOutput'] = $myResult;
-                ",
-                "supportingScriptUris": [
-                    "https://f4r3h36zdcxouazscripts.blob.core.windows.net/sample/my_module.psm1?sp=r&st=2020-07-30T20:37:19Z&se=2020-08-01T04:37:19Z&spr=https&sv=2019-12-12&sr=b&sig=gCCSbwbsLiZRue%2FrBG%2F8dsAhFrdYOcTItNmz6cHneF4%3D"
-                ],
+                    my_kv=$(az keyvault unknown);
+                    res=$?;
+                    echo 'result: $res';
+                    if [ $res - ne 0]; then
+                        echo \"$my_kv\" 1 > &2;
+                        exit 1;
+                    fi
+
+                    echo \"first arg: $1\";
+                    echo \"second arg: $2\";
+                    exit 0;",
                 "cleanupPreference": "OnExpiration",
                 "retentionInterval": "P1D"
             }
         }
     ],
     "outputs": {
-        "myResult": {
-           "type": "object",
-           "value": "[reference('runPwshInlineWithEscapedOutputs').Outputs.ScriptOutput]"
+        "result": {
+            "value": "[reference('runBashWithFiles').outputs]",
+            "type": "object"
         }
     }
 }

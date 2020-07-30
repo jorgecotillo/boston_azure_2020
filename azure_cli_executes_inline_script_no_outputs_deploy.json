@@ -16,7 +16,7 @@
             "identity": {
                 "type": "UserAssigned",
                 "userAssignedIdentities": {
-                    "subscriptions/foo/resourceGroups/bar/Microsoft.ManagedIdentity/userAssignedIdentities/baz": {}
+                    "subscriptions//resourceGroups/jcotillo-script-debug/providers/Microsoft.ManagedIdentity/userAssignedIdentities/jcotillo-script-msi": {}
                 }
             },
             "kind": "AzureCLI",

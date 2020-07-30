@@ -33,7 +33,7 @@
                         $DeploymentScriptOutputs['ScriptOutput'] = $myResult;
                 ",
                 "supportingScriptUris": [
-                    "https://"
+                    "https://.blob.core.windows.net/sample/my_module.psm1?sp=r&st=2020-07-30T20:37:19Z&se=2020-08-01T04:37:19Z&spr=https&sv=2019-12-12&sr=b&sig=gCCSbwbsLiZRue%2FrBG%2F8dsAhFrdYOcTItNmz6cHneF4%3D"
                 ],
                 "cleanupPreference": "OnExpiration",
                 "retentionInterval": "P1D"
